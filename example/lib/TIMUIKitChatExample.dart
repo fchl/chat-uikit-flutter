@@ -1,10 +1,15 @@
 // ignore_for_file: file_names
 
-import 'package:example/TIMUIKitGroupProfileExample.dart';
-import 'package:example/TIMUIKitProfileExample.dart';
+
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+
+
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+
+import 'TIMUIKitGroupProfileExample.dart';
+import 'TIMUIKitProfileExample.dart';
 
 class TIMUIKitChatExample extends StatelessWidget {
   final V2TimConversation? selectedConversation;
@@ -57,8 +62,8 @@ class TIMUIKitChatExample extends StatelessWidget {
     return TIMUIKitChat(
       conversation: selectedConversation ??
           V2TimConversation(
-              conversationID: "c2c_10040818",
-              userID: "10040818",
+              conversationID: "c2c_J82",
+              userID: "J82",
               showName: "Test Chat",
               type: 1),
       customStickerPanel: renderCustomStickerPanel,
@@ -70,11 +75,7 @@ class TIMUIKitChatExample extends StatelessWidget {
         isShowGroupReadingStatus: true,
         notificationTitle: "",
         isUseMessageReaction: true,
-        groupReadReceiptPermissionList: [
-          GroupReceiptAllowType.work,
-          GroupReceiptAllowType.meeting,
-          GroupReceiptAllowType.public
-        ],
+
       ),
         appBarConfig: AppBar(
           actions: [

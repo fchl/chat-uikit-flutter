@@ -13,7 +13,7 @@ class TIMUIKitGroupProfileExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return TIMUIKitGroupProfile(
       groupID: groupID ??
-          '@TGS#1X2AML5H6', // Please fill in here according to the actual cleaning
+          'tt', // Please fill in here according to the actual cleaning
     );
   }
 }

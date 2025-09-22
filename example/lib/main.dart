@@ -3,9 +3,13 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_sdk/enum/V2TimSDKListener.dart';
 import 'package:tencent_cloud_chat_sdk/enum/log_level_enum.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
+
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+
+import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+
 import 'TIMUIKitAddFriendExample.dart';
 import 'TIMUIKitAddGroupExample.dart';
 import 'TIMUIKitBlackListExample.dart';
@@ -16,7 +20,7 @@ import 'TIMUIKitGroupExample.dart';
 import 'TIMUIKitGroupProfileExample.dart';
 import 'TIMUIKitNewContactExample.dart';
 import 'TIMUIKitProfileExample.dart';
-import 'TIMUIKitSearchExample.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -31,15 +35,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Tencent IM UIKit',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
+
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(title: 'Tencent Cloud Chat UIKit'),
@@ -60,25 +56,45 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    initTIMUIKIT();
+    _checkIfConnected();
   }
 
   CoreServicesImpl timCoreInstance = TIMUIKitCore.getInstance();
 
   int getSDKAPPID() {
-    return const int.fromEnvironment('SDK_APPID', defaultValue: 0);
+    return const int.fromEnvironment('SDK_APPID', defaultValue: 1400538265);
   }
 
   String getUserID() {
-    return const String.fromEnvironment('LOGINUSERID', defaultValue: "10045363");
+    return const String.fromEnvironment('LOGINUSERID', defaultValue: "fchl");
+   // return const String.fromEnvironment('LOGINUSERID', defaultValue: "J82");
+    // return const String.fromEnvironment('LOGINUSERID', defaultValue: "J71");
+    return const String.fromEnvironment('LOGINUSERID', defaultValue: "jack");
   }
 
   String getSecret() {
-    return const String.fromEnvironment('SECRET', defaultValue: "");
+    return const String.fromEnvironment('SECRET', defaultValue: "998db5d97b0b019ceac4e53d5908d8f98b9b53d5a242bc78938d24650424115a");
   }
 
   String getUsersig() {
-    return const String.fromEnvironment('USERSIG', defaultValue: "");
+    return const String.fromEnvironment('USERSIG', defaultValue: "eJwtzE0LgkAUheH-MttCbzNzRxFa1SIslLAWgRtxxrpMfqBDBNF-z9TleQ68H3Y5Zd7L9Cxi3AO2njZp0ziqaOKqfDwXH7Qtuo40izYSAEXIFc6PeXfUm9ERkQPArI7qvwUYiiAMlFwqdB*zhoayamWW*wfYX2-HlRJYxE7Y*LxrEiwoGercT9sUrJFb9v0BO*8xCQ__");
+  }
+
+  Future<void> _checkIfConnected() async {
+    final res = await TencentImSDKPlugin.v2TIMManager.getLoginUser();
+    debugPrint("getLoginUser ${res.data}");
+    if (res.data != null && res.data!.isNotEmpty) {
+      return;
+    } else if (res.data == null || res.data!.isEmpty) {
+      await initTIMUIKIT();
+
+      return;
+    } else if (res.data!.isEmpty) {
+
+      return;
+    } else {
+      return;
+    }
   }
 
   initTIMUIKIT() async {
@@ -90,32 +106,51 @@ class _MyHomePageState extends State<MyHomePage> {
       print("The running parameters are abnormal, please check");
       return;
     }
+    debugPrint("timCoreInstance init ");
     await timCoreInstance.init(
       sdkAppID: sdkappid,
       loglevel: LogLevelEnum.V2TIM_LOG_DEBUG,
       listener: V2TimSDKListener(
-        onConnectFailed: (code, error) {},
-        onConnectSuccess: () {},
-        onConnecting: () {},
-        onKickedOffline: () {},
-        onSelfInfoUpdated: (V2TimUserFullInfo info) {},
-        onUserSigExpired: () {},
+        onConnectFailed: (code, error) {
+          debugPrint("tim  failed ${code}  error ${error}");
+        },
+        onConnectSuccess: () {
+          debugPrint('tim  初始化成功 ');
+
+
+        },
+        onConnecting: () {
+          debugPrint('tim  onConnecting ');
+        },
+        onKickedOffline: () {
+          debugPrint('tim  onKickedOffline ');
+        },
+        onUserSigExpired: () {
+          debugPrint('tim  onUserSigExpired ');
+        },
       ),
     );
-    V2TimCallback res =
+    var res =
         await timCoreInstance.login(userID: userid, userSig: usersig);
+    debugPrint("timCoreInstance  login ");
     print(
         "Log in to Tencent Cloud Instant Messaging IM Return：${res.toJson()}");
   }
 
   getAPIWidget(String apiName) {
+    var userId = "J82";
     switch (apiName) {
       case 'TIMUIKitConversation':
         return const TIMUIKitConversationExample();
       case 'TIMUIKitChat':
-        return const TIMUIKitChatExample();
+
+        return   TIMUIKitChatExample(selectedConversation: V2TimConversation(
+            conversationID: "c2c_$userId",
+            userID: userId,
+            showName: "你的昵称",
+            type: 1),);
       case 'TIMUIKitProfile':
-        return const TIMUIKitProfileExample();
+        return TIMUIKitProfileExample(userID: userId,);
       case 'TIMUIKitAddFriend':
         return const TIMUIKitAddFriendExample();
       case 'TIMUIKitAddGroup':
@@ -130,8 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
         return const TIMUIKitGroupProfileExample();
       case 'TIMUIKitNewContact':
         return const TIMUIKitNewContactExample();
-      case 'TIMUIKitSearch':
-        return const TIMUIKitSearchExample();
+
     }
   }
 
@@ -195,7 +229,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           onPressed: () {
                             openExamplePage(e);
                           },
-                          child: Text(e),
+                          child: Text(e,style: TextStyle(color: Colors.red),),
                         ),
                       )
                     ],

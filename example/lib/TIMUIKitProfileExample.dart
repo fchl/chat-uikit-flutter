@@ -10,7 +10,7 @@ class TIMUIKitProfileExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TIMUIKitProfile(
-      userID: userID ?? "10040818", // Please fill in here according to the actual cleaning
+      userID: userID ?? "fchl", // Please fill in here according to the actual cleaning
     );
   }
 }
